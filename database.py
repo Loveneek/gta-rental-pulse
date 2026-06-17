@@ -1,27 +1,38 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_connection():
-    return psycopg2.connect(
-        host="localhost",
-        database="rental_pulse",
-        user="loveneekgill",
-        password=""
-    )
+    return psycopg2.connect(os.getenv("DATABASE_URL"))
 
-def test_connection():
+def create_table():
     conn = get_connection()
-    print("Connected successfully!")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS listings (
+            id SERIAL PRIMARY KEY,
+            listing_id VARCHAR(50) UNIQUE,
+            address TEXT,
+            price INTEGER,
+            bedrooms INTEGER,
+            bathrooms NUMERIC(3,1),
+            sqft INTEGER,
+            date_scraped DATE DEFAULT CURRENT_DATE
+        );
+    """)
+    conn.commit()
+    cur.close()
     conn.close()
 
 def insert_listing(data):
     conn = get_connection()
     cur = conn.cursor()
-    
     cur.execute("""
         INSERT INTO listings 
             (listing_id, address, price, bedrooms, bathrooms, sqft)
-        VALUES 
-            (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT (listing_id) DO NOTHING;
     """, (
         data["listing_id"],
@@ -31,19 +42,6 @@ def insert_listing(data):
         data["bathrooms"],
         data["sqft"]
     ))
-    
     conn.commit()
     cur.close()
     conn.close()
-    print(f"Inserted: {data['address']}")
-
-test_listing = {
-    "listing_id": "1001",
-    "address": "210 Victoria St, Toronto",
-    "price": 2400,
-    "bedrooms": 1,
-    "bathrooms": 1.0,
-    "sqft": 650
-}
-
-insert_listing(test_listing)
