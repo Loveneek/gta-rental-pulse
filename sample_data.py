@@ -1,0 +1,18 @@
+sample_listings = [
+    {"zpid": "1001", "address": "210 Victoria St, Toronto", 
+     "price": 2400, "bedrooms": 1, "bathrooms": 1.0, "livingArea": 650},
+    {"zpid": "1002", "address": "85 Harbour St, Toronto",
+     "price": 3200, "bedrooms": 2, "bathrooms": 2.0, "livingArea": 900},
+    {"zpid": "1003", "address": "310 Front St W, Toronto",
+     "price": 1900, "bedrooms": 0, "bathrooms": 1.0, "livingArea": 480},
+    {"zpid": "1004", "address": "1200 Bay St, Toronto",
+     "price": 2800, "bedrooms": 2, "bathrooms": 1.0, "livingArea": 780},
+    {"zpid": "1005", "address": "45 Carlton St, Toronto",
+     "price": 3800, "bedrooms": 3, "bathrooms": 2.0, "livingArea": 1100},
+    {"zpid": "1006", "address": "890 Queen St W, Toronto",
+     "price": 2100, "bedrooms": 1, "bathrooms": 1.0, "livingArea": 560},
+    {"zpid": "1007", "address": "330 Bloor St W, Toronto",
+     "price": 4200, "bedrooms": 3, "bathrooms": 2.0, "livingArea": 1300},
+    {"zpid": "1008", "address": "15 Iceboat Terr, Toronto",
+     "price": 2600, "bedrooms": 2, "bathrooms": 1.0, "livingArea": 720},
+]
