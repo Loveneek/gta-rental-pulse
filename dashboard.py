@@ -2,41 +2,50 @@ import streamlit as st
 import pandas as pd
 from database import get_connection
 
-st.title("GTA Rental Pulse")
-st.write("Toronto rental market trends")
+st.set_page_config(page_title="GTA Rental Pulse", page_icon="🏠", layout="wide")
 
-# Pull data from database FIRST
-conn = get_connection()
-df = pd.read_sql("SELECT * FROM listings", conn)
-conn.close()
+@st.cache_data
+def load_data():
+    conn = get_connection()
+    df = pd.read_sql("SELECT * FROM listings", conn)
+    conn.close()
+    return df
 
-# Sidebar filter AFTER df exists
-st.sidebar.header("Filters")
-neighbourhoods = ["All"] + sorted(df["neighbourhood"].unique().tolist())
-selected = st.sidebar.selectbox("Neighbourhood", neighbourhoods)
+df = load_data()
 
-# Apply filter
-if selected != "All":
-    df = df[df["neighbourhood"] == selected]
+st.title("🏠 GTA Rental Pulse")
+st.write("Toronto rental market trends across 12 neighbourhoods")
 
-# Summary stats
-st.subheader("Market Overview")
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Listings", len(df))
-col2.metric("Avg Rent", f"${int(df['price'].mean())}")
-col3.metric("Avg Sqft", f"{int(df['sqft'].mean())}")
+st.divider()
 
-# Table of all listings
-st.subheader("All Listings")
-st.dataframe(df)
+# Top metrics
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Total Listings", f"{len(df):,}")
+col2.metric("Avg Rent", f"${int(df['price'].mean()):,}")
+col3.metric("Avg Sqft", f"{int(df['sqft'].mean()):,}")
+col4.metric("Neighbourhoods", df['neighbourhood'].nunique())
 
-# Average rent by bedrooms
-st.subheader("Average Rent by Bedrooms")
-avg_by_bed = df.groupby("bedrooms")["price"].mean().reset_index()
-avg_by_bed.columns = ["Bedrooms", "Average Rent"]
-st.bar_chart(avg_by_bed.set_index("Bedrooms"))
+st.divider()
 
-# Most expensive listings
-st.subheader("Top 5 Most Expensive Listings")
-top5 = df.sort_values("price", ascending=False).head(5)
-st.dataframe(top5[["address", "price", "bedrooms", "sqft"]])
+# Most and least expensive
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("🔴 Most Expensive Areas")
+    top = df.groupby("neighbourhood")["price"].mean().sort_values(ascending=False).head(5)
+    st.bar_chart(top)
+
+with col2:
+    st.subheader("🟢 Most Affordable Areas")
+    bottom = df.groupby("neighbourhood")["price"].mean().sort_values(ascending=True).head(5)
+    st.bar_chart(bottom)
+
+st.divider()
+
+st.subheader("📋 Recent Listings")
+st.dataframe(
+    df[["address", "neighbourhood", "price", "bedrooms", "sqft"]]
+    .sort_values("price", ascending=False)
+    .head(10),
+    use_container_width=True
+)
