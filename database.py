@@ -30,17 +30,18 @@ def insert_listing(data):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        INSERT INTO listings 
-            (listing_id, address, price, bedrooms, bathrooms, sqft)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        ON CONFLICT (listing_id) DO NOTHING;
+    INSERT INTO listings 
+        (listing_id, address, neighbourhood, price, bedrooms, bathrooms, sqft)
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (listing_id) DO NOTHING;
     """, (
-        data["listing_id"],
-        data["address"],
-        data["price"],
-        data["bedrooms"],
-        data["bathrooms"],
-        data["sqft"]
+    data["listing_id"],
+    data["address"],
+    data["neighbourhood"],
+    data["price"],
+    data["bedrooms"],
+    data["bathrooms"],
+    data["sqft"]
     ))
     conn.commit()
     cur.close()
